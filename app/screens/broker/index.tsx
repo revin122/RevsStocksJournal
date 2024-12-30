@@ -1,11 +1,15 @@
+import * as React from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Button, GestureResponderEvent, StyleSheet, Text, View } from 'react-native'
-import { ScreenStackParamList } from '@types'
+import { Button, FlatList, GestureResponderEvent, Text, TouchableOpacity, View } from 'react-native'
+import { BrokerParam, ScreenStackParamList } from '@types'
+import { styles } from './styles'
 
 type Props = NativeStackScreenProps<ScreenStackParamList, 'Broker'>
 
 const BrokerScreen: React.FC<Props> = ({ navigation }) => {
-  const selectBrokerButtonPress = (event : GestureResponderEvent) => {
+  const [brokerData, setBrokerData] = React.useState<BrokerParam[]>([{name: 'WeBull', id: 0}, {name:  'Robinhood', id: 1}])
+
+  const itemButtonPress = (event : GestureResponderEvent) => {
     navigation.navigate('Stocks')
   }
 
@@ -13,22 +17,38 @@ const BrokerScreen: React.FC<Props> = ({ navigation }) => {
     navigation.navigate('Stocks')
   }
 
+  const resetBrokerButtonPress = (event: GestureResponderEvent) => {
+    navigation.navigate('Stocks')
+  }
+
+  const addBroker = (newItem: BrokerParam) => {
+    setBrokerData([...brokerData, newItem])
+  }
+
   return (
     <View style={styles.container}>
-      <Text>Select Stock Broker</Text>
-      <Button onPress={selectBrokerButtonPress} title='I am broker 1'/>
-      <Button onPress={addBrokerButtonPress} title='Add Broker'/>
+      <Text style={styles.title}>Broker List</Text>
+      
+      <FlatList
+        data={brokerData}
+        keyExtractor={(item, index) => index.toString()}
+        contentContainerStyle={styles.flatListContainer}
+        renderItem={({item})  => 
+          <TouchableOpacity onPress={itemButtonPress} onLongPress={itemButtonPress}>
+            <Text style={styles.flatListItem}>{item.name}</Text>
+          </TouchableOpacity>}
+      />
+
+      <View style={styles.footer}>
+        <TouchableOpacity style={styles.resetBtn} onPress={resetBrokerButtonPress}>
+          <Text style={styles.btnText}>Reset</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.addBtn} onPress={addBrokerButtonPress}>
+        <Text style={styles.btnText}>+</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-})
 
 export default BrokerScreen
